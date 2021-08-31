@@ -231,10 +231,12 @@ function greetings() {
 		}
 		else {
 			console.log('yes');
-			window.addEventListener("devicemotion", accelerometerUpdate, true);
+			
+		}
+		function fireit(){
+			window.addEventListener("devicemotion", accelerometerUpdate, true);				       
 		}
 		function accelerometerUpdate(event) {
-			
 			var ax = event.acceleration.x;
 			var ay = event.acceleration.y;
 			sys=ay;
