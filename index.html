@@ -19,33 +19,9 @@
 		}
 	</style>
 <script>
-function show(shown, hidden) {
-  document.getElementById(shown).style.display='block';
-  document.getElementById(hidden).style.display='none';
-  return false;
-}
-function page3(){
-	setTimeout(myTimeout3, 1000) 
-	setTimeout(myTimeout2, 2000) 
-	setTimeout(myTimeout1, 3000)
-	setTimeout(myTimeout0, 3500)
-}
-function myTimeout3() {
-  document.getElementById("demo").innerHTML = "3 detik";
-}
-function myTimeout2() {
-  document.getElementById("demo").innerHTML = "2 detik";
-}
-function myTimeout1() {
-  document.getElementById("demo").innerHTML = "1 detik";
-}
-function myTimeout0() {
-  return show('Page3','Page2');
-  fireit();
-}
 function greetings() {
-  alert("Selamat datang, aplikasi ini dapat membaca detak jantung dan tekanan darahmu, cukup ikuti 3 langkahnya");
-}
+		  alert("Selamat datang, aplikasi ini dapat membaca detak jantung dan tekanan darahmu, cukup ikuti 3 langkahnya");
+		}
 </script>
 </head>
 <body onload="greetings()">
@@ -128,7 +104,32 @@ function greetings() {
 	</div>
 	</div>
 	<script> 
-var zbandpass;
+		function show(shown, hidden) {
+		  document.getElementById(shown).style.display='block';
+		  document.getElementById(hidden).style.display='none';
+		  return false;
+		}
+		function page3(){
+			setTimeout(myTimeout3, 1000) 
+			setTimeout(myTimeout2, 2000) 
+			setTimeout(myTimeout1, 3000)
+			setTimeout(myTimeout0, 3500)
+			fireit();
+		}
+		function myTimeout3() {
+		  document.getElementById("demo").innerHTML = "3 detik";
+		}
+		function myTimeout2() {
+		  document.getElementById("demo").innerHTML = "2 detik";
+		}
+		function myTimeout1() {
+		  document.getElementById("demo").innerHTML = "1 detik";
+		}
+		function myTimeout0() {
+		  return show('Page3','Page2');
+		}
+		
+		var zbandpass;
 		var EMAalow=0.01;
 		var EMAslow=0;
 		var EMAahigh=0.95;
@@ -223,23 +224,19 @@ var zbandpass;
 				
 			}
 		});
-		
-		if (window.DeviceMotionEvent == undefined) {
-			//No accelerometer is present. Use buttons. 
-			console.log('no');
-		}
-		else {
-			console.log('yes');
-			
-		}
-		function fireit(){
-			window.addEventListener("devicemotion", accelerometerUpdate, true);				       
-		}
+			function fireit(){
+				if (window.DeviceMotionEvent == undefined) {
+					console.log('no');
+				}
+				else {
+					console.log('yes');
+					window.addEventListener("devicemotion", accelerometerUpdate, true);
+				}
+			}
+							       
 		function accelerometerUpdate(event) {
-			var ax = event.acceleration.x;
 			var ay = event.acceleration.y;
 			sys=ay;
-			var az = event.acceleration.z;
 			let myavgbpm=document.getElementById("avgbpm");
 			let myavgsys=document.getElementById("avgsys");
 			let myavgdias=document.getElementById("avgdias");
