@@ -290,7 +290,7 @@ function greetings() {
 					  return el !=NaN;
 					});
 					var MOsys=(diastolearrayclean.reduce((a,b) => a + b, 0) / diastolearrayclean.length).toFixed(4);
-					var maxMOsys=mymaxdias.innerHTML=Math.min(...diastolearrayclean).toFixed(6);
+					var maxMOsys=Math.min(...diastolearrayclean).toFixed(6);
 					var avgdias=(coef_age_sys*umur)+(coef_avg_sys*MOsys)+(coef_bmi_sys*bmi)+(coef_max_sys*maxMOsys);
 					myavgdias.innerHTML=avgdias;
 					//mymindias.innerHTML=Math.max(...diastolearrayclean).toFixed(6);
