@@ -166,15 +166,17 @@ function greetings() {
 		var umur;
 		var intercept_dias=47.1525;
 		var coef_age_dias=0.2166;
-		var coef_avg_dias=0.00005;
-		var coef_max_dias=0.00005;
+		var coef_avg_dias=0.0001;
+		var coef_max_dias=0.0001;
 		var coef_bmi_dias=1.0832;
+		var error_dias=7.28;
 		
 		var intercept_sys=67.4171;
 		var coef_age_sys=0.6642;
 		var coef_avg_sys=-2.9138;
 		var coef_max_sys=0.6009;
 		var coef_bmi_sys=1.2651;
+		var error_sys=12.77;
 
 		init();
 		<!-- Mengambil referensi canvas chart -->
@@ -284,7 +286,7 @@ function greetings() {
 					var bmi=berat/(tinggi*tinggi)
 					var AOsys=(systolearrayclean.reduce((a,b) => a + b, 0) / systolearrayclean.length).toFixed(6);
 					var maxAOsys=Math.min(...systolearrayclean).toFixed(6);
-					var avgsys=(intercept_sys+(coef_age_sys*umur)+(coef_avg_sys*AOsys)+(coef_bmi_sys*bmi)+(coef_max_sys*maxAOsys)).toFixed(2);
+					var avgsys=(intercept_sys+(coef_age_sys*umur)+(coef_avg_sys*AOsys)+(coef_bmi_sys*bmi)+(coef_max_sys*maxAOsys)+error_sys).toFixed(2);
 					myavgsys.innerHTML=avgsys;
 					//myminsys.innerHTML=Math.max(...systolearrayclean).toFixed(6);
 					//mymaxsys.innerHTML=Math.min(...systolearrayclean).toFixed(6);
@@ -293,7 +295,7 @@ function greetings() {
 					});
 					var MOsys=(diastolearrayclean.reduce((a,b) => a + b, 0) / diastolearrayclean.length).toFixed(4);
 					var maxMOsys=Math.min(...diastolearrayclean).toFixed(6);
-					var avgdias=(intercept_dias+(coef_age_dias*umur)+(coef_avg_dias*MOsys)+(coef_bmi_dias*bmi)+(coef_max_dias*maxMOsys)).toFixed(2);
+					var avgdias=(intercept_dias+(coef_age_dias*umur)+(coef_avg_dias*MOsys)+(coef_bmi_dias*bmi)+(coef_max_dias*maxMOsys)+error_dias).toFixed(2);
 					myavgdias.innerHTML=avgdias;
 					//mymindias.innerHTML=Math.max(...diastolearrayclean).toFixed(6);
 					//mymaxdias.innerHTML=Math.min(...diastolearrayclean).toFixed(6);
