@@ -1,460 +1,56 @@
-<html>
-<head>
-<meta charset="utf-8">
-	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.2.1"></script>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-	<style type="text/css">
+<!doctype html>
+<html lang="en">
+  <head>
+	<script src="csv_generator.js"></script>
+    <meta charset="utf-8" />
+    <title> this is beta</title>
+  </head>
+  <body>
+	tes download csv
+	<script>
+		const rawsensor=[
+			['timestamp','gx','gy','gz','ax','ay','az'],
+			['00.00.00',0,0,0,0,0,0],
+		];
+		var count=0;
+		rawsensor.push(['11.00.00',1,0,0,0,0,0])
+		let csvContent = "data:text/csv;charset=utf-8," 
+			+ rawsensor.map(e => e.join(",")).join("\n");
 		
-		#acc {
-			font-weight: bold;
+		if (window.DeviceMotionEvent == undefined) {
+			//No accelerometer is present. Use buttons. 
+			console.log('no');
 		}
-		#acc.yes {
-			color: green;
+		else {
+			console.log('yes');
+			window.addEventListener("devicemotion", accelerometerUpdate, true);
 		}
-		#acc.no {
-			color: red;
-		}
-	</style>
-<script>
-function greetings() {
-		  alert("Selamat datang, aplikasi ini dapat membaca detak jantung dan tekanan darahmu, cukup ikuti 3 langkahnya");
-		}
-</script>
-</head>
-<body onload="greetings()">
-<div class="container bg-primary text-white"">
-	<h3 class="text-center"> Mobile Seismocardigraph</h3>
-</div>
-
-  <div id="Page1">
-	<div class="container bg-info text-white">
-	<br>
-	<p class="text-justify"> <b>Pertama</b> isi data berikut, lalu klik tombol </p>
-	</div>
-	<div class="container">
-	<table class="table" >
-	  <thead>
-		<tr>
-		  <th scope="col">
-		  <form>
-			<div class="form-group">
-				<label for="age">usia:</label>
-				<input type="number" id="age" name="umur" min="10" max="100">
-				</div>
-		  </form>
-		  </th>
-		  <th scope="col">
-			<form>
-				<div class="form-group">
-				<label for="height">tinggi:</label>
-				<input type="number" id="height" name="tinggi" min="10" max="250">
-				</div>
-			</form>
-		  </th>
-		  <th scope="col">
-		  <form>
-				<div class="form-group">
-				<label for="weight">berat:</label>
-				<input type="number" id="weight" name="berat" min="10" max="200">
-				</div>
-			</form>
-		  </th>
-		</tr>
-	  </thead>
-	  </table>
-	  <div class="container" style="text-align: center;">
-		<button type="button" class="btn btn-info" onclick="return show('Page2','Page1');">Lanjut Langkah 2</button>
-		</div>
-	</table>
-	</div>
-    </div>
-	
-	
-  <div id="Page2" style="display:none">
-	<div class="container bg-info text-white">
-	<br>
-	<p class="text-justify"> <b>Kedua</b> genggam smartphone didada tempatkan sisi kiri smartphone sejajar tengah dada seperti pada gambar</p>
-	</div>
-	<div class="container" style="text-align: center;">
-	<img src="https://raw.githubusercontent.com/kotakkubus/kotakkubus.github.io/main/pic.jpg">
-	</div>
-	<div class="container">
-	<p class="text-justify">  beri tekanan ke dada cukup kuat lalu tekan tombol</p>
-	</div>
-	<div class="container" style="text-align: center;">
-		<button type="button" class="btn btn-info" onclick="page3()">Lanjut Langkah 3</button>
-		<p id="demo">
-	</div>
-  </div>
-  
-  <div id="Page3" style="display:none">
-	<div class="container bg-info text-white">
-	<br>
-	<p class="text-justify"> <b>Ketiga</b> jangan bergerak, tetap genggam dan tekan smartphone!</p>
-	</div>
-	<div class="container">
-	<br>
-	<p class="text-center"> grafik seismokardiograf</p> 
-	<div class="chart-container">
-		<!-- Canvas untuk rendering chart -->
-		<canvas id="chartCanvas" width="80" height="40"></canvas>
-	</div>
-	</div>
-	<script> 
-		function show(shown, hidden) {
-		  document.getElementById(shown).style.display='block';
-		  document.getElementById(hidden).style.display='none';
-		  return false;
-		}
-		function page3(){
-			setTimeout(myTimeout3, 1000) 
-			setTimeout(myTimeout2, 2000) 
-			setTimeout(myTimeout1, 3000)
-			setTimeout(myTimeout0, 3500)
-			fireit();
-		}
-		function myTimeout3() {
-		  document.getElementById("demo").innerHTML = "3 detik";
-		}
-		function myTimeout2() {
-		  document.getElementById("demo").innerHTML = "2 detik";
-		}
-		function myTimeout1() {
-		  document.getElementById("demo").innerHTML = "1 detik";
-		}
-		function myTimeout0() {
-		  return show('Page3','Page2');
-		}
-		
-		var zbandpass;
-		var EMAalow=0.01;
-		var EMAslow=0;
-		var EMAahigh=0.95;
-		var EMAshigh=0;
-		<!-- Mengambil referensi canvas chart -->
-		const self = this; // refer this within script tag context
-		let interval = null;
-
-		const maxThreshold = 50;
-		const seconds = [0]; // x
-		const datas = [0]; // y
-		const datasclean = [0]; // y
-		var beatarray=[];
-		var averagearray=[];
-		//bpm,sys,dias data
-		var outlier=[];
-		var systolearray=[];
-		var timesystolearray=[];
-		var diastolearray=[];
-		var bpm=0;
-		var systole=0;
-		var diastole=0;
-		var i=0;
-		var j=0;
-		var k=0;
-		var yy=0;
-		var ya=0;
-		var yb=0;
-		var ibisystole=[];
-		var arraybpm=[];
-		var sys;
-		var tinggi;
-		var berat;
-		var umur;
-		var intercept_dias=47.1525;
-		var coef_age_dias=0.2166;
-		var coef_avg_dias=0.0001;
-		var coef_max_dias=0.0001;
-		var coef_bmi_dias=1.0832;
-		var error_dias=7.28;
-		
-		var intercept_sys=67.4171;
-		var coef_age_sys=0.6642;
-		var coef_avg_sys=-2.9138;
-		var coef_max_sys=0.6009;
-		var coef_bmi_sys=1.2651;
-		var error_sys=12.77;
-
-		init();
-		<!-- Mengambil referensi canvas chart -->
-		const ctxChart = document.getElementById('chartCanvas').getContext('2d');
-		<!-- Membuat data pada chart dengan type serta labels yang sesuai -->
-		const chartInstance = new Chart(ctxChart, {
-			type: 'line',
-			data: {
-				labels: seconds,
-				datasets: [
-					{
-						spanGaps: true,
-						pointRadius: 0 ,
-						label: "Aorta",
-						fill: false,
-						borderColor: 'rgb(57, 192, 43)',
-						data: datas
-					},
-					{
-						spanGaps: true,
-						pointRadius: 0 ,
-						label: "beat",
-						fill: false,
-						borderColor: 'rgb(200, 50, 43)',
-						data: beatarray
-					},
-					{
-						spanGaps: true,
-						pointRadius: 0 ,
-						label: "Mitral",
-						fill: false,
-						borderColor: 'rgb(70, 50, 180)',
-						data: averagearray
-					},
-				]
-			},
-			options: {
-				spanGaps: true,
-				animation:false,
-				 
-				hover: {
-					animationDuration: 0 // duration of animations when hovering an item
-				},
-				line: {
-					tension: 0, // disables bezier curves
-					pointRadius: 0
-				},
-				responsiveAnimationDuration: 0 // animation duration after a resize
-				
-			}
-		});
-			function fireit(){
-				if (window.DeviceMotionEvent == undefined) {
-					console.log('no');
-				}
-				else {
-					console.log('yes');
-					window.addEventListener("devicemotion", accelerometerUpdate, true);
-				}
-			}
-							       
 		function accelerometerUpdate(event) {
+			var ax = event.acceleration.x;
 			var ay = event.acceleration.y;
-			sys=ay;
-			let myavgbpm=document.getElementById("avgbpm");
-			let myavgsys=document.getElementById("avgsys");
-			let myavgdias=document.getElementById("avgdias");
-			let thebar = document.getElementById("myBar");	
-			let mystatus=document.getElementById("svgheart");
-			
-			beatarray=smoothed_z_score(datas);
-			if((beatarray[beatarray.length-1])==1){
-				i++;
-				timesystolearray[i]=new Date().getTime();
-				var tempyy=yy;
-				//var tempya=(Math.log(averagearray[averagearray.length-1]))/(Math.log(5));;
-				var tempinterval=(timesystolearray[i])-(timesystolearray[i-1])
-				var cleanarray = averagearray.filter(function (el) {
-					  return el != ''&& el != 'NaN';
-					});	
-				if (tempinterval>400&&tempinterval<1500){
-					ibisystole[j]=tempinterval;
-					systolearray[j] = tempyy;
-					var avgdiastole=Math.max(...cleanarray).toFixed(6)
-					diastolearray[j]=(Math.log(avgdiastole))/(Math.log(5));
-					var persen=j*5 
-					thebar.style.width = persen + "%";
-  					thebar.innerHTML = "menghitung";
-					j++;	
-				}
-				//myndata.innerHTML="Dataset:"+j;
-				if(j>=20){
-					systolearray[0]=systolearray[1];
-					
-					myavgbpm.innerHTML=(60000/(ibisystole.reduce((a,b) => a + b, 0) / ibisystole.length)).toFixed(2);
-					//myminbpm.innerHTML=(60000/Math.min(...ibisystole)).toFixed(2);
-					//mymaxbpm.innerHTML=(60000/Math.max(...ibisystole)).toFixed(2);
-					
-					//myavgibi.innerHTML=(ibisystole.reduce((a,b) => a + b, 0) / ibisystole.length).toFixed(2);
-					//myminibi.innerHTML=(Math.min(...ibisystole)).toFixed(2);
-					//mymaxibi.innerHTML=(Math.max(...ibisystole)).toFixed(2);
-					
-					var systolearrayclean = systolearray.filter(function (el) {
-					  return el !=NaN;
-					});
-					tinggi=document.getElementById('height').value;
-					berat=document.getElementById('weight').value;
-					umur=document.getElementById('age').value;
-					var bmi=berat/(tinggi*tinggi)
-					var AOsys=(systolearrayclean.reduce((a,b) => a + b, 0) / systolearrayclean.length).toFixed(6);
-					var maxAOsys=Math.min(...systolearrayclean).toFixed(6);
-					var avgsys=(intercept_sys+(coef_age_sys*umur)+(coef_avg_sys*AOsys)+(coef_bmi_sys*bmi)+(coef_max_sys*maxAOsys)+error_sys).toFixed(2);
-					myavgsys.innerHTML=avgsys;
-					//myminsys.innerHTML=Math.max(...systolearrayclean).toFixed(6);
-					//mymaxsys.innerHTML=Math.min(...systolearrayclean).toFixed(6);
-					var diastolearrayclean = diastolearray.filter(function (el) {
-					  return el !=NaN;
-					});
-					var MOsys=(diastolearrayclean.reduce((a,b) => a + b, 0) / diastolearrayclean.length).toFixed(4);
-					var maxMOsys=Math.min(...diastolearrayclean).toFixed(6);
-					var avgdias=(intercept_dias+(coef_age_dias*umur)+(coef_avg_dias*MOsys)+(coef_bmi_dias*bmi)+(coef_max_dias*maxMOsys)+error_dias).toFixed(2);
-					myavgdias.innerHTML=avgdias;
-					//mymindias.innerHTML=Math.max(...diastolearrayclean).toFixed(6);
-					//mymaxdias.innerHTML=Math.min(...diastolearrayclean).toFixed(6);
-					i=0;
-					j=0;
-				}			
+			var az = event.acceleration.z;
+			var gx = event.rotationRate.beta;
+			var gy = event.rotationRate.gamma;
+			var gz = event.rotationRate.alpha;	
+			var time = new Date().getTime(); 
+			let counting = document.getElementById("itung");
+			//console.log(count);
+			if (count>=1&&count<2000){
+				rawsensor.push([time,gx,gy,gz,ax,ay,az]);
+				count++;
 			}
-			var linamplifier=(((ay-0)*(10-0))/(1-0))+0;
-			var linearamplified=ay*linamplifier;
-			var logamplified=Math.pow(5,linearamplified);
-			EMAslow=(EMAalow*logamplified)+((1-EMAalow)*EMAslow);
-		    EMAshigh=(EMAahigh*logamplified)+((1-EMAahigh)*EMAshigh);
-			bandpass=(EMAshigh-EMAslow);
-				let len = seconds.length;
-				if (len > maxThreshold) {
-					seconds.shift();
-					datas.shift();
-					len = seconds.length;
-				}
-				seconds.push(addTime());
-				datas.push(bandpass);
-				refresh();
-				
-				function startInterval () {
-					interval = setInterval(addData,10);
-				}
-
-				function stopInterval () {
-					clearInterval(interval);
-				}
-
-				function refresh () {
-					chartInstance.labels = seconds;
-					chartInstance.data.datasets[0].data = datas;
-					chartInstance.data.datasets[1].data = beatarray;
-					chartInstance.data.datasets[2].data = averagearray;
-					chartInstance.update();
-				}
-		}
-		
-		function init () {
-			for (let i = 0; i < maxThreshold; i++) {
-				seconds.push(0);
-				datas.push(0);
+			if (count==2000){
+				var encodedUri = encodeURI(csvContent);
+				var link = document.createElement("a");
+				link.setAttribute("href", encodedUri);
+				link.setAttribute("download", "dataku.csv");
+				document.body.appendChild(link); // Required for FF
+				link.click(); // This will download the data file named "my_data.csv".
+				count=0;
 			}
+			counting.innerHTML=count;
 		}
-
-		function addTime () {
-			const epoch = Math.floor(new Date().getTime()/1000.0);
-			const myDate = new Date(epoch * 1000);
-			const time = Date.now() + "";
-			const ms = time.slice(time.length - 3);
-			const dateFormat = `${myDate.getHours()}:${myDate.getMinutes()}:${myDate.getSeconds()}:${ms}`;
-			return dateFormat;
-		}
-		
-		function sum(a) {
-			return a.reduce((acc, val) => acc + val)
-		}
-
-		function mean(a) {
-			return sum(a) / a.length
-		}
-
-		function stddev(arr) {
-			const arr_mean = mean(arr)
-			const r = function(acc, val) {
-				return acc + ((val - arr_mean) * (val - arr_mean))
-			}
-			return Math.sqrt(arr.reduce(r, 0.0) / arr.length)
-		}
-
-		function smoothed_z_score(y, params) {
-			var p = params || {}
-			// init cooefficients
-			const lag = p.lag || 5
-			const threshold = p.threshold || 5
-			const influence = p.influece || 0.75
-
-			if (y === undefined || y.length < lag + 2) {
-				throw ` ## y data array to short(${y.length}) for given lag of ${lag}`
-			}
-			//console.log(`lag, threshold, influence: ${lag}, ${threshold}, ${influence}`)
-
-			// init variables
-			var signals = Array(y.length).fill(0)
-			var filteredY = y.slice(0)
-			const lead_in = y.slice(0, lag)
-			//console.log("1: " + lead_in.toString())
-
-			var avgFilter = []
-			avgFilter[lag - 1] = mean(lead_in)
-			averagearray=avgFilter;
-			var stdFilter = []
-			stdFilter[lag - 1] = stddev(lead_in)
-			//console.log("2: " + stdFilter.toString())
-
-			for (var i = lag; i < y.length; i++) {
-				//console.log(`${y[i]}, ${avgFilter[i-1]}, ${threshold}, ${stdFilter[i-1]}`)
-				if (Math.abs(y[i] - avgFilter[i - 1]) > (threshold * stdFilter[i - 1])) {
-					if (y[i] > avgFilter[i - 1]) {
-						signals[i] = +1 // positive signal
-						yy=(Math.log(y[i]))/(Math.log(5));
-						//ya=(Math.log(averagearray[]))/(Math.log(5));
-					} else {
-						signals[i] = 0 // negative signal
-					}
-					// make influence lower
-					filteredY[i] = influence * y[i] + (1 - influence) * filteredY[i - 1]
-				} else {
-					signals[i] = 0 // no signal
-					filteredY[i] = y[i];
-				}
-
-				// adjust the filters
-				const y_lag = filteredY.slice(i - lag, i)
-				avgFilter[i] = mean(y_lag)
-				stdFilter[i] = stddev(y_lag)
-			}
-
-			return signals
-		}
-
 	</script>
-	<div class="container">
-	<br>
-	<p class="text-center"> tabel hasil laju denyut dan tekanan sistolik diastolik</p> 
-	<div class="progress">
-    		<div class="progress-bar progress-bar-info progress-bar-striped" id= "myBar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:50%">
-     		proses menghitung
-    	</div>
-  	</div>
-	</div>		    
-	<div class="container">
-	<table class="table">
-    <thead>
-      <tr class="table-info">
-        <th>Informasi</th>
-        <th>Nilai</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="table-light">
-        <th>Heart Rate (bpm)</th>
-        <td id="avgbpm">bpm</td>
-      </tr>
-      <tr>
-        <th>Systole (mmHg)</th>
-        <td id="avgsys" >sys</td>
-      </tr>
-      <tr class="table-light">
-        <th>Diastole (mmHg)</th>
-        <td id="avgdias">dias</td>
-      </tr>
-    </tbody>
-	</table>
-	</div>
-  </div>
-</body>
+	<p id="itung">counting</p>
+  </body>
 </html>
