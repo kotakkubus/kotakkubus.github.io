@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+	<script src="csv_generator.js"></script>
     <meta charset="utf-8" />
     <title> this is beta</title>
   </head>
@@ -29,6 +30,7 @@
 			window.addEventListener("devicemotion", accelerometerUpdate, true);
 		}
 		function accelerometerUpdate(event) {
+			console.log('ini');
 			ax = event.acceleration.x;
 			ay = event.acceleration.y;
 			az = event.acceleration.z;
@@ -37,26 +39,29 @@
 			gz = event.rotationRate.alpha;	
 			time = new Date().getTime(); 
 			let counting = document.getElementById("itung");
-			//console.log(count);
+			let data= document.getElementById("datanya");
 			if (count>=0){
 				//rawsensor.push([time,gx,gy,gz,ax,ay,az]);
-				rawsensor.push([time,gx,gy,gz,ax,ay,az]);
+			//	rawsensor.push([time,gx,gy,gz,ax,ay,az]);
 				count++;
-				//console.log(count);
+				console.log(count);
 			}
-			if (count==3000){
-				let csvContent = "data:text/csv;charset=utf-8," + rawsensor.map(e => e.join(",")).join("\n");
-				var encodedUri = encodeURI(csvContent);
-				var link = document.createElement("a");
-				link.setAttribute("href", encodedUri);
-				link.setAttribute("download", "dataku.csv");
-				document.body.appendChild(link); // Required for FF
-				link.click(); // This will download the data file named "my_data.csv".
-				count=0;
-			}
+			//if (count==5){
+			//	let csvContent = "data:text/csv;charset=utf-8," + rawsensor.map(e => e.join(",")).join("\n");
+		
+			//	var encodedUri = encodeURI(csvContent);
+			//	var link = document.createElement("a");
+			//	link.setAttribute("href", encodedUri);
+			//	link.setAttribute("download", "dataku.csv");
+			//	document.body.appendChild(link); // Required for FF
+			//	link.click(); // This will download the data file named "my_data.csv".
+			//	count=0;
+			//}
 			counting.innerHTML=count;
+			data.innerHTML=time+gx+gy+gz+ax+ay+az
 		}
 	</script>
 	<p id="itung">counting</p>
+	<p id="datanya">data</p>
   </body>
 </html>
