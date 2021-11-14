@@ -13,8 +13,6 @@
 		var count=0;
 		var ay = 0;	
 		var time = 0;
-		//rawsensor.push(['11.00.00',1])
-
 		if (window.DeviceMotionEvent == undefined) {
 			//No accelerometer is present. Use buttons. 
 			console.log('no');
@@ -24,7 +22,6 @@
 			window.addEventListener("devicemotion", accelerometerUpdate, true);
 		}
 		function accelerometerUpdate(event) {
-			console.log('ini');
 			ay = event.acceleration.y;
 			time = new Date().getTime(); 
 			let counting = document.getElementById("itung");
