@@ -8,17 +8,12 @@
 	tes download csv
 	<script>
 		var rawsensor=[
-			['timestamp','gx','gy','gz','ax','ay','az'],
+			['timestamp','ay'],
 		];
 		var count=0;
-		var ax = 0;
-		var ay = 0;
-		var az = 0;
-		var gx = 0;
-		var gy = 0;
-		var gz = 0;	
+		var ay = 0;	
 		var time = 0;
-		//rawsensor.push(['11.00.00',1,1,1,1,1,1])
+		//rawsensor.push(['11.00.00',1])
 
 		if (window.DeviceMotionEvent == undefined) {
 			//No accelerometer is present. Use buttons. 
@@ -30,22 +25,17 @@
 		}
 		function accelerometerUpdate(event) {
 			console.log('ini');
-			ax = event.acceleration.x;
 			ay = event.acceleration.y;
-			az = event.acceleration.z;
-			gx = event.rotationRate.beta;
-			gy = event.rotationRate.gamma;
-			gz = event.rotationRate.alpha;	
 			time = new Date().getTime(); 
 			let counting = document.getElementById("itung");
 			let data= document.getElementById("datanya");
 			if (count>=0){
 				//rawsensor.push([time,gx,gy,gz,ax,ay,az]);
-				rawsensor.push([time,gx,gy,gz,ax,ay,az]);
+				rawsensor.push([time,ay]);
 				count++;
 				console.log(count);
 			}
-			if (count==3000){
+			if (count==6000){
 				let csvContent = "data:text/csv;charset=utf-8," + rawsensor.map(e => e.join(",")).join("\n");
 		
 				var encodedUri = encodeURI(csvContent);
@@ -57,7 +47,7 @@
 				count=0;
 			}
 			counting.innerHTML=count;
-			data.innerHTML=time+','+gx+','+gy+','+gz+','+ax+','+ay+','+az;
+			data.innerHTML=time+','+ay;
 		}
 	</script>
 	<p id="itung">counting</p>
