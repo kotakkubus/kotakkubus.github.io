@@ -285,9 +285,11 @@ function greetings(){
 				progbar.value=prog;
 				document.getElementById("pemrosesan").innerHTML = "Mengambil data "+prog+"%";
 				if(count>4000&&count<5000)
-				document.getElementById("pemrosesan").innerHTML = "Pemrosesan akhir "+prog+"%";
-				if(count>=5500)
-				document.getElementById("pemrosesan").innerHTML = "Selesai";
+				document.getElementById("pemrosesan").innerHTML = "pemrosesan data "+prog+"%";
+				if(count>=5500&&count<5990)
+				document.getElementById("pemrosesan").innerHTML = "penghitungan informasi "+prog+"%";
+				if(count>=5990)
+				document.getElementById("pemrosesan").innerHTML = "selesai "+prog+"%";
 				count++;
 			}
 			if (count>=6000){
