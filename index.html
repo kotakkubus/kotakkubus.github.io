@@ -280,7 +280,7 @@ function greetings(){
 				//rawsensor.push([time,gx,gy,gz,ax,ay,az]);
 				dataay.push(ay);
 				//console.log(count);
-				var prog=(count/6000).toFixed(2);
+				var prog=(count/60).toFixed(2);
 				var progbar=document.getElementById("progress_data");
 				progbar.value=prog;
 				document.getElementById("pemrosesan").innerHTML = "Mengambil data "+prog+"%";
