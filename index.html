@@ -1,112 +1,63 @@
 <!DOCTYPE html>
 <html>
-<body>
+  <head>
+    <title>WiFi Signal Strength Demo</title>
+  </head>
+  <body>
+    <p>Current WiFi signal strength:</p>
+    <div id="rtt"></div>
+	<div id="downlink"></div>
+	<div id="uplink"></div>
+	<div id="count"></div>
+	
+    <script>
+      // Get the current network connection information
+	  
+	  const networkInfo = navigator.connection;
 
-<canvas id="my-canvas" width="400" height="220"></canvas>
-<button onclick="getLocation()">Try It</button>
-<p id="long"></p>
-<p id="lat"></p>
-<p id="head"></p>
-<p id="speed"></p>
-<p id="acu"></p>
+		// Check if the network information is available
+		if (networkInfo) {
+		  // Add an event listener for changes in the network information
+		  networkInfo.addEventListener('change', (event) => {
+			// Check if the RTT property is available in the event object
+			if (event.rtt) {
+			  // Log the new RTT value
+			  console.log('New RTT value:', event.rtt);
+			}
+		  });
+		} else {
+		  console.error('Network information is not available');
+		}
+	  const count =document.getElementById("count");
+	   var start = new Date().getTime();
+		setInterval(function() {
+			var now = new Date().getTime();
+			count.innerHTML = (now - start) + 'ms elapsed';
+			getwifidata();
+		}, 40);
+		
+		function getwifidata(){
+		 const connection = navigator.connection || navigator.webkitConnection;
 
-<script>
-var long = document.getElementById("long");
-var lat = document.getElementById("lat");
-var head = document.getElementById("head");
-var speed = document.getElementById("speed");
-var acu = document.getElementById("acu");
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.watchPosition(showPosition);
-  } else { 
-    x.innerHTML = "Geolocation is not supported by this browser.";
-  }
-}
-    
-function showPosition(position) {
-    long.innerHTML= position.coords.latitude ;
-	lat.innerHTML= position.coords.longitude ;
-	head.innerHTML= position.coords.heading ;
-	speed.innerHTML= position.coords.speed ;
-	acu.innerHTML= position.coords.accuracy ;
-}
-
-//drawing
-var canvas = document.querySelector('#my-canvas');
-var context = canvas.getContext('2d');
- function drawPoint(context, x, y, label, color, size) {
-      	if (color == null) {
-        	color = '#000';
-        }
-        if (size == null) {
-            size = 5;
-        }
-      
-      	// to increase smoothing for numbers with decimal part
-      	var pointX = Math.round(x);
-        var pointY = Math.round(y);
-
-        context.beginPath();
-        context.fillStyle = color;
-        context.arc(pointX, pointY, size, 0 * Math.PI, 2 * Math.PI);
-        context.fill();
-      
-      	if (label) {
-            var textX = pointX;
-          	var textY = Math.round(pointY - size - 3);
-          
-            context.font = 'Italic 14px Arial';
-            context.fillStyle = color;
-            context.textAlign = 'center';
-            context.fillText(label, textX, textY);
-        }
-    }
-
-    function drawLine(context, x1, y1, x2, y2) {
-        context.beginPath();
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
-        context.stroke();
-        context.strokeStyle='#56aaff';
-    }
-
-    function drawCircle(x, y, radius) {
-        context.beginPath();
-        context.arc(x, y, radius, 1 * Math.PI, 0);
-        context.stroke();
-    }
-
-    function draw(context, text,x,y) {
-        context.fillText(text, x, y); // fillText(text, xStart, yStart);
-        context.font = 'Arial';
-        context.fillStyle = 'black';
-    }
-
-    // drawPoint(context, 20, 30, 'wifi 1', 'blue', 5);
-    // drawPoint(context, 50, 120, 'wifi 2', 'blue', 5);
-    // drawPoint(context, 140, 70, 'wifi 3', 'blue', 5);
-
-    drawLine(context, 0, 110, 200, 220);
-    drawLine(context, 400, 110, 200, 220);
-
-    drawLine(context, 100, 20, 200, 220);
-    drawLine(context, 300, 20, 200, 220);
-
-    drawLine(context, 0, 220, 400, 220);
-
-    drawCircle(200,220, 50);
-    drawCircle(200,220, 100);
-    drawCircle(200,220, 150);
-    drawCircle(200,220, 200);
-
-    draw(context,'5m',220,165);
-    draw(context,'10m',235,120);
-    draw(context,'15m',255,75);
-    draw(context,'20m',275,25);
-
-</script>
-
-</body>
+		  if (connection) {
+			// Retrieve the current downlink speed in Mbps
+			const rtt = connection.rtt;
+			const downlink = connection.downlink;
+			const uplink = connection.downlinkMax;
+			// Display the estimated signal strength in an HTML element
+			const rttel = document.getElementById("rtt");
+			const dlel = document.getElementById("downlink");
+			const upel = document.getElementById("uplink");
+			rttel.innerHTML = rtt;
+			dlel.innerHTML = downlink;
+			upel.innerHTML = uplink;
+		  } else {
+			// Connection information not available
+			const rttel = document.getElementById("rtt");
+			rttel.innerHTML = "Connection information not available";
+		  }
+		}
+     
+    </script>
+  </body>
 </html>
-
